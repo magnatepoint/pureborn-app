@@ -1,7 +1,7 @@
 import 'package:shared_preferences/shared_preferences.dart';
 
 class Constants {
-  static const String apiUrl = 'http://192.168.29.40:3000/api';
+  static const String apiUrl = 'https://pureborn-app.onrender.com/api';
 
   static Future<String?> getToken() async {
     final prefs = await SharedPreferences.getInstance();
