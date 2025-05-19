@@ -26,19 +26,23 @@ class DayCounter {
   });
 
   factory DayCounter.fromJson(Map<String, dynamic> json) {
-    return DayCounter(
-      id: json['_id'],
-      date: DateTime.parse(json['date']),
-      openingBalance: (json['openingBalance'] as num).toDouble(),
-      payments: Payments.fromJson(json['payments']),
-      expenses: (json['expenses'] as num).toDouble(),
-      totalDayCounter: (json['totalDayCounter'] as num).toDouble(),
-      cashHandOver: (json['cashHandOver'] as num).toDouble(),
-      actualClosingCounter: (json['actualClosingCounter'] as num).toDouble(),
-      closingBalance: (json['closingBalance'] as num).toDouble(),
-      difference: (json['difference'] as num).toDouble(),
-      remarks: json['remarks'] ?? '',
-    );
+    try {
+      return DayCounter(
+        id: json['_id'],
+        date: DateTime.parse(json['date']),
+        openingBalance: (json['openingBalance'] as num).toDouble(),
+        payments: Payments.fromJson(json['payments']),
+        expenses: (json['expenses'] as num).toDouble(),
+        totalDayCounter: (json['totalDayCounter'] as num).toDouble(),
+        cashHandOver: (json['cashHandOver'] as num).toDouble(),
+        actualClosingCounter: (json['actualClosingCounter'] as num).toDouble(),
+        closingBalance: (json['closingBalance'] as num).toDouble(),
+        difference: (json['difference'] as num).toDouble(),
+        remarks: json['remarks'] ?? '',
+      );
+    } catch (e) {
+      throw Exception('DayCounter.fromJson error: \$e, json: \$json');
+    }
   }
 
   Map<String, dynamic> toJson() {
@@ -84,12 +88,16 @@ class Payments {
   });
 
   factory Payments.fromJson(Map<String, dynamic> json) {
-    return Payments(
-      cash: (json['cash'] as num).toDouble(),
-      upi: (json['upi'] as num).toDouble(),
-      card: (json['card'] as num).toDouble(),
-      credit: (json['credit'] as num).toDouble(),
-    );
+    try {
+      return Payments(
+        cash: (json['cash'] as num).toDouble(),
+        upi: (json['upi'] as num).toDouble(),
+        card: (json['card'] as num).toDouble(),
+        credit: (json['credit'] as num).toDouble(),
+      );
+    } catch (e) {
+      throw Exception('Payments.fromJson error: \$e, json: \$json');
+    }
   }
 
   Map<String, dynamic> toJson() {
