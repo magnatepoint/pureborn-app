@@ -15,6 +15,7 @@ class DashboardScreenState extends State<DashboardScreen> {
   final _expenseService = ExpenseService();
   List<Expense> _expenses = [];
   bool _isLoading = true;
+  String? _error;
   final _currencyFormat = NumberFormat.currency(
     locale: 'en_IN',
     symbol: '₹',
@@ -31,21 +32,21 @@ class DashboardScreenState extends State<DashboardScreen> {
     try {
       setState(() {
         _isLoading = true;
+        _error = null;
       });
       final expenses = await _expenseService.getExpenses();
       setState(() {
         _expenses = expenses;
         _isLoading = false;
+        _error = null;
       });
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text('Error loading expenses: $e')));
+        setState(() {
+          _isLoading = false;
+          _error = e.toString();
+        });
       }
-      setState(() {
-        _isLoading = false;
-      });
     }
   }
 
@@ -72,6 +73,52 @@ class DashboardScreenState extends State<DashboardScreen> {
       return const Center(child: CircularProgressIndicator());
     }
 
+    if (_error != null) {
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Icon(Icons.error, color: Colors.red, size: 48),
+            const SizedBox(height: 16),
+            Text(
+              'Error loading expenses:',
+              style: TextStyle(fontSize: 18, color: Colors.red),
+            ),
+            const SizedBox(height: 8),
+            Text(_error!, textAlign: TextAlign.center),
+            const SizedBox(height: 16),
+            ElevatedButton.icon(
+              onPressed: _loadExpenses,
+              icon: const Icon(Icons.refresh),
+              label: const Text('Retry'),
+            ),
+          ],
+        ),
+      );
+    }
+
+    if (_expenses.isEmpty) {
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(Icons.receipt_long, size: 64, color: Colors.grey[400]),
+            const SizedBox(height: 16),
+            Text(
+              'No expenses found',
+              style: TextStyle(fontSize: 18, color: Colors.grey[400]),
+            ),
+            const SizedBox(height: 16),
+            ElevatedButton.icon(
+              onPressed: _loadExpenses,
+              icon: const Icon(Icons.refresh),
+              label: const Text('Refresh'),
+            ),
+          ],
+        ),
+      );
+    }
+
     final totalExpenses = _calculateTotalExpenses();
     final totalBalanceDue = _calculateTotalBalanceDue();
     final categoryTotals = _calculateExpensesByCategory();
@@ -82,6 +129,16 @@ class DashboardScreenState extends State<DashboardScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const SizedBox(height: 16),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              ElevatedButton.icon(
+                onPressed: _loadExpenses,
+                icon: const Icon(Icons.refresh),
+                label: const Text('Refresh'),
+              ),
+            ],
+          ),
           ModernCard(
             title: 'Summary',
             padding: const EdgeInsets.all(16.0),
